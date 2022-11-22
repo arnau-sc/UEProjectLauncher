@@ -174,7 +174,7 @@ def openInGithub():
 # menu bar
 with dpg.viewport_menu_bar():
     with dpg.menu(label="About"):
-        dpg.add_text("""With <3 from arnau-sc. Open an inssue for any bugs.\nProgram version: """+ version)
+        dpg.add_text("""With <3 from arnau-sc. Open an issue for any bugs.\nProgram version: """+ version)
         dpg.add_button(label="Open in Github", small=True, callback=openInGithub)
 
 #main dpg window
