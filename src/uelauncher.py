@@ -9,7 +9,7 @@ import webbrowser
 #always needs to happen first
 dpg.create_context()
 
-version="1.0.0"
+version="1.0.1"
 
 #window icons
 
@@ -54,7 +54,6 @@ def loadConfig():
     currentenginepath = cfg.get("projectpath", "engine")
     dpg.set_value("log", str2bool(cfg.get("launcheroptions", "log")))
     dpg.set_value("nosound", str2bool(cfg.get("launcheroptions", "nosound")))
-    dpg.set_value("skipcompile", str2bool(cfg.get("launcheroptions", "skipcompile")))
     dpg.set_value("runtype", cfg.get("launcheroptions", "runtype"))
     dpg.set_value("customflags", cfg.get("launcheroptions", "customflags"))
 
@@ -78,7 +77,6 @@ else:
     cfg.add_section("launcheroptions")
     cfg.set("launcheroptions", "nosound", "False")
     cfg.set("launcheroptions", "log", "False")
-    cfg.set("launcheroptions", "skipcompile", "False")
     cfg.set("launcheroptions", "runtype", "game")
     cfg.set("launcheroptions", "customflags", "")
     with open(userconfigpath, "w") as cfgobj:
@@ -98,7 +96,6 @@ def saveConfig():
 
     cfg.set("launcheroptions", "nosound", str(dpg.get_value("nosound")))
     cfg.set("launcheroptions", "log", str(dpg.get_value("log")))
-    cfg.set("launcheroptions", "skipcompile", str(dpg.get_value("skipcompile")))
     cfg.set("launcheroptions", "runtype", str(dpg.get_value("runtype")))
     cfg.set("launcheroptions", "customflags", str(dpg.get_value("customflags")))
     with open(userconfigpath, "w") as cfgobj:
@@ -162,11 +159,13 @@ def runProject():
     global currentpath
     global currentenginepath
     cfg.read(userconfigpath)
-    appendedrunpath = currentenginepath+" "+currentpath+" -"+dpg.get_value("runtype")+" "+getFlagFromItem("log")+getFlagFromItem("nosound")+getFlagFromItem("skipcompile")+dpg.get_value("customflags")
+    currentenginepath_fixed = currentenginepath.replace("/", "\\")
+    currentpath_fixed = currentpath.replace("/", "\\")
+    appendedrunpath = f'""{currentenginepath_fixed}" "{currentpath_fixed}" -{dpg.get_value("runtype")} {getFlagFromItem("log")}{getFlagFromItem("nosound")}{dpg.get_value("customflags")}"'
+    finalpath = appendedrunpath
+    print(finalpath)
+    os.system(finalpath)
 
-    print(appendedrunpath)
-    os.system(appendedrunpath)
-    
 def openInGithub():
     webbrowser.open("https://github.com/arnau-sc/UEProjectLauncher")
 
@@ -200,11 +199,6 @@ with dpg.window(tag="Primary Window"):
     dpg.add_checkbox(label="No Sound", tag="nosound", callback=saveConfig)
     with dpg.tooltip("nosound"):
         dpg.add_text("Disables sound")
-    
-    dpg.add_checkbox(label="Skip Compile", tag="skipcompile", callback=saveConfig)
-    with dpg.tooltip("skipcompile"):
-        dpg.add_text("""Skips the scripts compilation on editor startup,
-useful when launching engine from IDE.""")
     
     dpg.add_separator()
     dpg.add_input_text(label="Custom Flags", tag="customflags", hint="Set your own custom flags. format: -flag1 -flag2 etc.", callback=saveConfig)
